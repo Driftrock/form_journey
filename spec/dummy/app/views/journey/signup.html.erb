@@ -1,0 +1,8 @@
+<%= form_tag current_step_path do %>
+  <%= text_field_tag :example_param, get_journey_param(:example_param) %>
+  <%= text_field_tag 'user[name]', get_journey_param(:user, :name) %>
+
+  <hr />
+
+  <%= submit_tag 'Next' %>
+<% end %>
