@@ -59,4 +59,12 @@ RSpec.describe FormJourney::Parameters do
       })
     end
   end
+
+  describe '#clear' do
+    it 'clears the params' do
+      expect(subject.keys).to include('user')
+      subject.clear
+      expect(subject).to eq({})
+    end
+  end
 end

@@ -55,7 +55,7 @@ journey_params.set(:user, :address, value: 'Regent Street')
 journey_params.require(:user).permit(:name, :email) #=> { user: { name: '...', email: '...' } }
 
 # To clear the params
-journey_params.clear_session
+journey_params.clear
 ```
 
 ###Routes

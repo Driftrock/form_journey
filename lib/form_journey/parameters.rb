@@ -11,7 +11,8 @@ module FormJourney
       end
     end
 
-    def clear_session
+    def clear
+      replace({})
       @session.clear
     end
 
@@ -64,7 +65,7 @@ module FormJourney
     private
 
     def update_session
-      clear_session
+      @session.clear
       @session.merge!(deep_symbolize_keys)
     end
   end
