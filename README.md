@@ -5,7 +5,6 @@ Include the `FormJourney::Controller` module to any Rails controller to create a
 ```ruby
 class UserSignupController < ApplicationController
   include FormJourney::Controller
-  include FormJourney::Parameters
   steps :signup, :personal, :additional_information
 
   def signup
@@ -19,33 +18,44 @@ class UserSignupController < ApplicationController
 
   def additional_information
   end
+
+  private
+
+  def user_params
+    # Any value in the "post" params will be included on the "journey_params" and kept in session
+    journey_params.require(:user).permit(:name, :email)
+  end
 end
 ```
 
 ###Using journey parameters
-You must have included the `FormJourney::Parameters` to use it.
 
 ```ruby
 # journey_params
 # {
-#   'action' => 'signup',
-#   'controller' => 'user_signup',
-#   'user' => {
-#     'name' => 'John Smith',
-#     'email' => 'john@example.com'
+#   action: 'signup',
+#   controller: 'user_signup',
+#   user: {
+#     name: 'John Smith',
+#     email: 'john@example.com'
 #   }
 # }
 
-get_journey_param(:user) #=> { 'name' => 'John Smith' ... }
-get_journey_param(:user, :name) #=> John Smith
-get_journey_param(:user, :email) #=> 'john@example.com'
-get_journey_param(:user, :address) #=> nil
-get_journey_param(:user, :image, :url) #=> nil
+journey_params.get(:user) #=> { name: '...', email: '...' }
+journey_params.get(:user, :name) #=> John Smith
+journey_params.get(:user, :email) #=> 'john@example.com'
+journey_params.get(:user, :address) #=> nil
+journey_params.get(:user, :image, :url) #=> nil
 
-del_journey_param(:user, :name) #=> 'John Smith'
-del_journey_param(:user, :address) #=> nil
+journey_params.del(:user, :name) #=> 'John Smith'
+journey_params.del(:user, :address) #=> nil
 
-journey_params #=> { ..., 'user' => { 'email' => 'john@example.com' } }
+journey_params.set(:user, :address, value: 'Regent Street')
+
+journey_params.require(:user).permit(:name, :email) #=> { user: { name: '...', email: '...' } }
+
+# To clear the params
+journey_params.clear_session
 ```
 
 ###Routes
