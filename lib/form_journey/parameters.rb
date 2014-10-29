@@ -1,23 +1,27 @@
 module FormJourney
-  module Parameters
-    extend ActiveSupport::Concern
+  class Parameters < HashWithIndifferentAccess
+    def initialize(attributes = nil, session)
+      super(attributes)
+      @session = session
 
-    included do
-      before_action :update_journey_params
-      helper_method :journey_params
-      helper_method :get_journey_param
+      if @session && attributes
+        @session.deep_merge!(attributes)
+        update(@session)
+        update_session
+      end
     end
 
-    def journey_params
-      session[:journey_params] ||= {}
+    def clear_session
+      @session.clear
     end
 
-    def clear_journey_params
-      session[:journey_params] = {}
+    def []=(key, value)
+      super
+      update_session
     end
 
-    def get_journey_param(*keys)
-      params = journey_params.clone.deep_stringify_keys
+    def get(*keys)
+      params = to_hash
       while !keys.empty?
         return nil if params.nil?
         params = params[keys.shift.to_s]
@@ -25,29 +29,43 @@ module FormJourney
       params
     end
 
-    def del_journey_param(*keys)
-      parent_param = journey_params
+    def del(*keys)
+      parent_param = self
       while !keys.empty?
         return nil if parent_param.nil?
 
         if keys.length == 1
-          del_param = parent_param.try(:delete, keys.shift.to_s)
+          del_param = parent_param.try(:delete, keys.shift)
+          update_session
           return del_param
         end
-        parent_param = parent_param[keys.shift.to_s]
+        parent_param = parent_param[keys.shift]
       end
+    end
+
+    def set(*keys, value:)
+      parent_param = self
+      while !keys.empty?
+        return nil if parent_param.nil?
+
+        if keys.length == 1
+          parent_param[keys.shift] = value
+          update_session
+          return self
+        end
+        parent_param = parent_param[keys.shift]
+      end
+    end
+
+    def require(key)
+      ActionController::Parameters.new(to_hash).require(key)
     end
 
     private
 
-    def update_journey_params
-      journey_params.deep_merge!(filtered_params)
-    end
-
-    def filtered_params
-      params.deep_stringify_keys.reject do |k, value|
-        ['utf8', 'authenticity_token'].include?(k) || value.blank?
-      end
+    def update_session
+      clear_session
+      @session.merge!(deep_symbolize_keys)
     end
   end
 end

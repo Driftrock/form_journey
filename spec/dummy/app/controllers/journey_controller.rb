@@ -1,6 +1,5 @@
 class JourneyController < ApplicationController
   include FormJourney::Controller
-  include FormJourney::Parameters
   steps :signup, :personal, :additional_information
 
   def signup

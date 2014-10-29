@@ -71,6 +71,10 @@ module FormJourney
       return yield if request.get?
     end
 
+    def journey_params
+      @journey_params ||= FormJourney::Parameters.new(params, journey_session)
+    end
+
     private
 
     def previous_steps
@@ -86,6 +90,10 @@ module FormJourney
     def before_step_action
       method = "before_#{current_step}"
       return self.send(method) if self.respond_to?(method, true)
+    end
+
+    def journey_session
+      (session["#{params[:controller]}_journey_session".to_sym] ||= {})
     end
 
     module ClassMethods
