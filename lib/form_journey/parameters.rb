@@ -1,14 +1,10 @@
 module FormJourney
   class Parameters < HashWithIndifferentAccess
     def initialize(attributes = nil, session)
-      super(attributes)
       @session = session
-
-      if @session && attributes
-        @session.deep_merge!(attributes)
-        update(@session)
-        update_session
-      end
+      attributes.deep_merge!(@session) if @session && attributes
+      super(attributes)
+      update_session
     end
 
     def clear
