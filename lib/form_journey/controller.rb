@@ -67,6 +67,18 @@ module FormJourney
       return yield if request.post?
     end
 
+    def when_patch
+      return yield if request.patch?
+    end
+
+    def when_post_or_patch
+      return yield if request.patch? || request.post?
+    end
+
+    def when_delete
+      return yield if request.delete?
+    end
+
     def when_get
       return yield if request.get?
     end
