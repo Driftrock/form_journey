@@ -6,7 +6,7 @@ module FormJourney
       super(@session)
     end
 
-    def clear
+    def clear!
       replace({})
       @session.clear
     end

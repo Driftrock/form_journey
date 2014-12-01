@@ -91,7 +91,7 @@ RSpec.describe FormJourney::Controller do
     end
 
     it 'should clear the journey params' do
-      expect(journey_params).to receive(:clear)
+      expect(journey_params).to receive(:clear!)
       subject.edit
     end
 

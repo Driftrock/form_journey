@@ -7,7 +7,7 @@ module FormJourney
     end
 
     def edit
-      journey_params.clear
+      journey_params.clear!
       journey_params.set(:_model_object_id, value: params[:id])
       redirect_to step_path(steps.first)
     end
