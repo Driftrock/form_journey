@@ -1,5 +1,6 @@
 #form_journey
-Readme up-to-date for version '0.1.0'
+
+_Readme up-to-date for version '0.1.0'_
 
 Include the `FormJourney::Controller` module to any Rails controller to create a multi page form.
 
@@ -27,6 +28,7 @@ class UserSignupController < ApplicationController
     journey_params.require(:user).permit(:name, :email)
   end
 end
+
 ```
 
 ###Single Model form journey
@@ -34,6 +36,7 @@ end
 When using a single model on the form journey there is a helper module
 
 ```ruby
+
 class UserSignupController < ApplicationController
   include FormJourney::Controller
   include FormJourney::UsesSingleModel
@@ -48,17 +51,15 @@ class UserSignupController < ApplicationController
     journey_params.require(:user).permit(:name, :email)
   end
 end
+```
 
-This automatically creates an edit route and a helper method for getting
-the current model instance based on the user params. The method to
-retrieve the model instance is based on an underscored version of the model name:
+This automatically creates an edit route and a helper method for getting the current model instance based on the user params. The method to retrieve the model instance is based on an underscored version of the model name:
 
 ```ruby
 
 model_class User #=> helper_method :user
 model_class MyUser #=> helper_method :my_user
 model_class Admin::MyUser #=> helper_method :admin_my_user
-
 ```
 
 ###Using journey parameters
