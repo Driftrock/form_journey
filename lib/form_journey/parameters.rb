@@ -53,6 +53,19 @@ module FormJourney
       end
     end
 
+    def add_to_array(*path, value:, unique: false)
+      array = Array(get(*path))
+      array << value
+      array.uniq! if unique
+      set(*path, value: array)
+    end
+
+    def remove_from_array(*path, value:)
+      array = Array(get(*path))
+      array.select! { |v| v != value }
+      set(*path, value: array)
+    end
+
     def require(key)
       ActionController::Parameters.new(to_hash).require(key)
     end
