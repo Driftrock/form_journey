@@ -133,7 +133,7 @@ RSpec.describe FormJourney::Parameters do
     end
   end
 
-  describe '#[]=' do
+  describe '#set' do
     it 'updates the session hash' do
       subject.set(:user, :address, value: 'Regent Street')
       expect(request_session).to eq({
@@ -148,10 +148,10 @@ RSpec.describe FormJourney::Parameters do
     end
   end
 
-  describe '#clear' do
+  describe '#clear!' do
     it 'clears the params' do
       expect(subject.keys).to include('user')
-      subject.clear
+      subject.clear!
       expect(subject).to eq({})
     end
   end
