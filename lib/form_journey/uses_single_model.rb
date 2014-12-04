@@ -42,8 +42,10 @@ module FormJourney
       if scope.respond_to?(:call)
         instance_exec(model_class, &scope)
       else
-        message, *params = Array(scope)
-        model_class.send(message.to_sym, *params)
+        messages = Array(scope)
+        messages.reduce(model_class) do |chained_scope, message|
+          chained_scope.send(message.to_sym)
+        end
       end
     end
 

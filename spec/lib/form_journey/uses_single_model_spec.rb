@@ -172,31 +172,21 @@ RSpec.describe FormJourney::Controller do
         end
       end
 
-      context 'using a message' do
-        context 'with params' do
-          let(:scope) { nil }
-          let(:message) { :some_scope }
-          let(:scope_params) { [:a, :b, :c] }
+      context 'using chained messages' do
+        let(:scope) { nil }
+        let(:message) { :some_scope }
+        let(:message2) { :some_other_scope }
 
-          before do
-            subject.class.model_scope message, *scope_params
-          end
-
-          it 'should attempt to call it with params' do
-            expect(DummyModel).to receive(message).with(*scope_params)
-              .and_return(DummyModel)
-            subject.dummy_model
-          end
+        before do
+          subject.class.model_scope message, message2
         end
 
-        context 'with no params' do
-          let(:scope) { :some_scope }
-
-          it 'should attempt to call it' do
-            expect(DummyModel).to receive(scope).and_return(DummyModel)
-            subject.dummy_model
-          end
+        it 'should attempt to call all messages' do
+          expect(DummyModel).to receive(message).and_return(DummyModel)
+          expect(DummyModel).to receive(message2).and_return(DummyModel)
+          subject.dummy_model
         end
+
       end
     end
 
