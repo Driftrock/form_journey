@@ -2,15 +2,11 @@ require 'spec_helper'
 
 RSpec.describe FormJourney::Controller do
   class DummyModel
+    def self.for_company(company)
+      DummyModel
+    end
   end
 
-  class DummySingleModelController < ApplicationController
-    include FormJourney::Controller
-    include FormJourney::UsesSingleModel
-    steps :step_one, :step_two, :step_three
-    params_method :obj_params
-    model_class DummyModel
-  end
 
   let(:obj_params) { {} }
 
@@ -29,8 +25,46 @@ RSpec.describe FormJourney::Controller do
   end
   
   before do
+    stub_const 'DummySingleModelController', ActionController::Base
+    DummySingleModelController.class_eval do
+      include FormJourney::Controller
+      include FormJourney::UsesSingleModel
+      steps :step_one, :step_two, :step_three
+      params_method :obj_params
+      model_scope nil
+      model_class DummyModel
+      def current_company_id
+        "123"
+      end
+    end
+
     allow(subject).to receive(:params).and_return(params)
     allow(subject).to receive(:journey_params).and_return(journey_params)
+  end
+
+  describe '::model_scope' do
+
+    context 'with a single value' do
+      let(:scope) { 'rargh' }
+
+      before do
+        subject.class.send(:model_scope, scope)
+      end
+
+      it 'should set the scope to that val' do
+        expect(subject.class._model_scope).to eq scope
+      end
+    end
+
+    context 'with multiple values' do
+      let(:scope) { ['rargh', 'argh'] }
+      before do
+        subject.class.send(:model_scope, *scope)
+      end
+      it 'should set the scope to an array' do
+        expect(subject.class._model_scope).to be_a Array
+      end
+    end
   end
 
   describe '::params_method' do
@@ -120,6 +154,49 @@ RSpec.describe FormJourney::Controller do
       DummyModel.new.tap do |model|
         allow(model).to receive(:id).and_return(123213)
         allow(model).to receive(:assign_attributes)
+      end
+    end
+    
+    context 'with a model scope' do
+      before do
+        allow(DummyModel).to receive(:new).and_return(model_instance)
+        subject.class.model_scope scope
+      end
+
+      context 'using a callable' do
+        let(:scope) { proc { |clasz| clasz.for_company(current_company_id) } }
+
+        it 'should work in the correct instance' do
+          expect(subject).to receive(:current_company_id).and_call_original
+          subject.dummy_model
+        end
+      end
+
+      context 'using a message' do
+        context 'with params' do
+          let(:scope) { nil }
+          let(:message) { :some_scope }
+          let(:scope_params) { [:a, :b, :c] }
+
+          before do
+            subject.class.model_scope message, *scope_params
+          end
+
+          it 'should attempt to call it with params' do
+            expect(DummyModel).to receive(message).with(*scope_params)
+              .and_return(DummyModel)
+            subject.dummy_model
+          end
+        end
+
+        context 'with no params' do
+          let(:scope) { :some_scope }
+
+          it 'should attempt to call it' do
+            expect(DummyModel).to receive(scope).and_return(DummyModel)
+            subject.dummy_model
+          end
+        end
       end
     end
 
