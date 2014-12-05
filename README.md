@@ -1,6 +1,6 @@
 #form_journey
 
-_Readme up-to-date for version '0.1.0'_
+_Readme up-to-date for version '0.2.0'_
 
 Include the `FormJourney::Controller` module to any Rails controller to create a multi page form.
 
@@ -61,6 +61,41 @@ model_class User #=> helper_method :user
 model_class MyUser #=> helper_method :my_user
 model_class Admin::MyUser #=> helper_method :admin_my_user
 ```
+
+##Scoping
+
+Often you'll want to scope the model used to be specific to the current user,
+rather than overwriting the model access methods you can define a model_scope:
+
+```ruby
+
+class UserSignupController < ApplicationController
+  include FormJourney::Controller
+  include FormJourney::UsesSingleModel
+  steps :signup, :personal, :additional_information
+  model_class User # also accepts a string representation of the constant
+
+  model_scope proc { |model_class| model_class.for_company(current_company) }
+
+  params_method :user_params # also accepts a block
+
+end
+
+```
+
+The proc runs in the context of the controller so it has access to any
+helper methods you may have defined for getting current session data.
+
+It can also be defined by a chain of symbols when there are no parameters to
+pass, e.g:
+
+```ruby
+model_class User
+model_scope :enabled, :confirmed # => User.enabled.confirmed
+```
+
+The scope will be used both for retrieving an existing model during an edit
+and for creating a new model.
 
 ###Using journey parameters
 
