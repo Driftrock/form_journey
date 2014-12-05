@@ -62,7 +62,7 @@ model_class MyUser #=> helper_method :my_user
 model_class Admin::MyUser #=> helper_method :admin_my_user
 ```
 
-##Scoping
+####Scoping
 
 Often you'll want to scope the model used to be specific to the current user,
 rather than overwriting the model access methods you can define a model_scope:
