@@ -3,6 +3,7 @@ module FormJourney
     extend ActiveSupport::Concern
     included do
       class_attribute :_model_class
+      class_attribute :_model_scope
       class_attribute :_params_method
     end
 
@@ -25,11 +26,25 @@ module FormJourney
     def model_object
       @model_object ||= begin
         if editing?
-          self.class._model_class.find(model_object_id).tap do |obj|
+          scoped_class.find(model_object_id).tap do |obj|
             obj.assign_attributes(model_params)
           end
         else
-          self.class._model_class.new(model_params)
+          scoped_class.new(model_params)
+        end
+      end
+    end
+
+    def scoped_class
+      model_class = self.class._model_class
+      scope = self.class._model_scope
+      return model_class unless scope
+      if scope.respond_to?(:call)
+        instance_exec(model_class, &scope)
+      else
+        messages = Array(scope)
+        messages.reduce(model_class) do |chained_scope, message|
+          chained_scope.send(message.to_sym)
         end
       end
     end
@@ -45,6 +60,14 @@ module FormJourney
     module ClassMethods
       def params_method(params_method)
         self._params_method = params_method
+      end
+
+      def model_scope(*scope)
+        if scope.size == 1
+          self._model_scope = scope.first
+        else
+          self._model_scope = scope
+        end
       end
 
       def model_class(clasz)
