@@ -2,7 +2,7 @@ module FormJourney
   class Parameters < HashWithIndifferentAccess
     def initialize(attributes = nil, session)
       @session = (session || {})
-      @session.deep_merge!(attributes) if attributes
+      @session.deep_merge!(attributes.deep_symbolize_keys) if attributes
       super(@session)
     end
 

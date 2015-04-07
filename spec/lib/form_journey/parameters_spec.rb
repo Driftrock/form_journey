@@ -12,8 +12,8 @@ RSpec.describe FormJourney::Parameters do
     }
   end
 
-  let(:request_session) do
-    @request_session = {
+  let!(:request_session) do
+    {
       user: {
         email: 'email@example.com'
       }
@@ -145,6 +145,24 @@ RSpec.describe FormJourney::Parameters do
           address: 'Regent Street'
         }
       })
+    end
+
+    context 'with empty session' do
+      before do
+        params.clear
+        request_session.clear
+      end
+
+      it 'updates deep values' do
+        subject.set(:user, value: { address: 'Regent Street' })
+        new_subject = FormJourney::Parameters.new({ 'user' => { 'name' => 'Test' } }, request_session)
+        expect(request_session).to eq({
+          user: {
+            address: 'Regent Street',
+            name: 'Test'
+          }
+        })
+      end
     end
   end
 
