@@ -28,15 +28,29 @@ module FormJourney
     end
 
     def steps
-      instance_steps || self.class._steps
+      instance_steps
     end
 
     def instance_steps
-      @instance_steps ||= nil
+      @instance_steps ||= self.class._steps.dup
     end
 
     def update_steps(*new_steps)
-      @instance_steps ||= previous_steps.concat(new_steps)
+      @instance_steps = new_steps
+    end
+
+    def add_step(new_step, before: nil)
+      if before
+        index = instance_steps.index(before)
+        return nil unless index
+        instance_steps.insert(index, new_step)
+      else
+        instance_steps << new_step
+      end
+    end
+
+    def remove_step(step_name)
+      instance_steps.delete(step_name)
     end
 
     def step_path(step)

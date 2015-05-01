@@ -18,16 +18,49 @@ RSpec.describe FormJourney::Controller do
   end
 
   describe '#update_steps' do
-    before do
+    before(:each) do
+      subject.update_steps(:other_step)
       subject.update_steps(:new_step)
     end
 
     it 'updates steps only for instance' do
-      expect(subject.steps).to eq([:step_one, :step_two, :new_step])
+      expect(subject.steps).to eq([:new_step])
     end
 
     it 'keeps class level steps the same' do
       expect(subject.class._steps).to eq([:step_one, :step_two, :step_three])
+    end
+  end
+
+  describe '#add_step' do
+    describe 'without an index' do
+      before do
+        subject.add_step(:new_step)
+      end
+
+      it 'adds the step at the end of the array' do
+        expect(subject.steps).to eq([:step_one, :step_two, :step_three, :new_step])
+      end
+    end
+
+    describe 'with an index' do
+      before do
+        subject.add_step(:new_step, before: :step_two)
+      end
+
+      it 'adds the step after the specified index' do
+        expect(subject.steps).to eq([:step_one, :new_step, :step_two, :step_three])
+      end
+    end
+  end
+
+  describe '#remove_step' do
+    before do
+      subject.remove_step(:step_one)
+    end
+
+    it 'removes the step' do
+      expect(subject.steps).to eq([:step_two, :step_three])
     end
   end
 
