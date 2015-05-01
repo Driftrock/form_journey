@@ -1,6 +1,10 @@
 #form_journey
 
-_Readme up-to-date for version '0.2.0'_
+_Readme up-to-date for version '0.3.0'_
+
+```ruby
+gem 'form_journey'
+```
 
 Include the `FormJourney::Controller` module to any Rails controller to create a multi page form.
 
