@@ -36,7 +36,7 @@ module FormJourney
     end
 
     def update_steps(*new_steps)
-      @instance_steps ||= previous_steps.concat(new_steps)
+      @instance_steps = new_steps
     end
 
     def step_path(step)

@@ -19,11 +19,12 @@ RSpec.describe FormJourney::Controller do
 
   describe '#update_steps' do
     before do
+      subject.update_steps(:other_step)
       subject.update_steps(:new_step)
     end
 
     it 'updates steps only for instance' do
-      expect(subject.steps).to eq([:step_one, :step_two, :new_step])
+      expect(subject.steps).to eq([:new_step])
     end
 
     it 'keeps class level steps the same' do
