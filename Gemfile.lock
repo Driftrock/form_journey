@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    form_journey (0.2.1)
+    form_journey (0.3.0)
       rails (~> 4.1.6)
 
 GEM
