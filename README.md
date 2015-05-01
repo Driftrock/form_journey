@@ -133,6 +133,28 @@ journey_params.remove_from_array(:user, :phone_numbers, value: '002') #=> ['001'
 journey_params.clear!
 ```
 
+###Changing steps
+You can change steps for a controller instance and update the journey. We suggest you do so with a `before_action`.
+```ruby
+class UserSignupController < ApplicationController
+  include FormJourney::Controller
+  steps :signup, :personal, :additional_information
+  
+  before_action :add_extra_step
+  
+  protected
+  
+  def add_extra_step
+    if unknow_referer?
+      add_step(:referer)
+      # You can also add the step before a existing one
+      # add_step(:referer, before: :additional_information)
+    end
+  end
+
+end
+```
+
 ###Routes
 Define journey routes using the `mount_journey` method.
 
