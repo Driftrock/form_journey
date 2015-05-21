@@ -89,4 +89,55 @@ RSpec.describe FormJourney::Controller do
       subject.send(:before_step_action)
     end
   end
+
+  context 'with multiple instances' do
+    let(:instance_one) { DummyController.new }
+    let(:instance_two) { DummyController.new }
+    let(:instance_three) { DummyController.new }
+
+    let(:params_one) do
+      {
+        name: 'Test One',
+        journey_session_key: '1'
+      }
+    end
+
+    let(:params_two) do
+      {
+        name: 'Test One',
+        journey_session_key: '2'
+      }
+    end
+
+    let(:params_three) do
+      {}
+    end
+
+    let(:session) { {} }
+
+    before do
+      allow(instance_one).to receive(:params) { params_one }
+      allow(instance_one).to receive(:session) { session }
+      allow(instance_two).to receive(:params) { params_two }
+      allow(instance_two).to receive(:session) { session }
+      allow(instance_three).to receive(:params) { params_three }
+      allow(instance_three).to receive(:session) { session }
+    end
+
+    it 'creates namespaced sessions' do
+      instance_one.journey_params
+      instance_two.journey_params
+
+      expect(session.keys).to eq [:dummy_journey_session_1, :dummy_journey_session_2]
+    end
+
+    context 'when session key is not present' do
+      it 'generates a new key' do
+        instance_three.journey_params
+        key = session.keys.first.to_s
+
+        expect(key).to match(/dummy_journey_session_[a-z0-9]+\z/)
+      end
+    end
+  end
 end

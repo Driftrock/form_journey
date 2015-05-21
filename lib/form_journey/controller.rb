@@ -13,6 +13,7 @@ module FormJourney
       helper_method :previous_step_path
       helper_method :current_step_number
       helper_method :total_steps_number
+      helper_method :journey_session_key
 
       [:current_step, :previous_step, :next_step].each do |key|
         class_eval do
@@ -54,7 +55,7 @@ module FormJourney
     end
 
     def step_path(step)
-      url_for(controller: params[:controller], action: step)
+      url_for(controller: params[:controller], action: step, journey_session_key: journey_session_key)
     end
 
     def current_step
@@ -118,8 +119,22 @@ module FormJourney
       return self.send(method) if self.respond_to?(method, true)
     end
 
+    def fetch_journey_session_key
+      param_key = params[:journey_session_key]
+      return param_key if param_key
+      SecureRandom.hex
+    end
+
+    def journey_session_key
+      @journey_session_key ||= fetch_journey_session_key
+    end
+
+    def journey_session_name
+      [controller_name, 'journey_session', journey_session_key].join('_').to_sym
+    end
+
     def journey_session
-      (session["#{params[:controller]}_journey_session".to_sym] ||= {})
+      (session[journey_session_name] ||= {})
     end
 
     module ClassMethods
