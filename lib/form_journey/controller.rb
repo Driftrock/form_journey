@@ -17,8 +17,8 @@ module FormJourney
 
       [:current_step, :previous_step, :next_step].each do |key|
         class_eval do
-          define_method "#{key}_path".to_sym do
-            step_path(self.send(key))
+          define_method "#{key}_path".to_sym do |query_params={}|
+            step_path(self.send(key), query_params)
           end
         end
       end
@@ -54,8 +54,12 @@ module FormJourney
       instance_steps.delete(step_name)
     end
 
-    def step_path(step)
-      url_for(controller: params[:controller], action: step, journey_session_key: journey_session_key)
+    def step_path(step, query_params = {})
+      url_opts = query_params.merge(
+        controller: params[:controller],
+        action: step,
+        journey_session_key: journey_session_key)
+      url_for(url_opts)
     end
 
     def current_step
